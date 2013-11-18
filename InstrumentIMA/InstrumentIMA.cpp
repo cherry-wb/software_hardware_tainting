@@ -49,22 +49,6 @@ namespace {
 	    					}
 	    				}
 	    			}
-
-//	    			//no need to check while profiling if initialization is sound
-//	    			//taint check
-//	    			if(isa<LoadInst>(curr_instr)){
-//	    				LoadInst* li = (LoadInst*) curr_instr;
-//	    				//check whether the return value of this instruction is used in a getelementptr instruction
-//	    				for(Value::use_iterator use_it = li->use_begin(), use_end = li->use_end(); use_it != use_end; ++use_it){
-//	    					User *user = *use_it;
-//	    					if(isa<GetElementPtrInst>(user)){
-//	    						GetElementPtrInst* gepi = (GetElementPtrInst*) user;
-//	    						if(gepi->getOperand(0)==li){
-//	    							instrumentCheck(bb, li, gepi, gepi->getNextNode());
-//	    						}
-//	    					}
-//	    				}
-//	    			}
 	    		}
 	    	}
 
@@ -80,21 +64,6 @@ namespace {
 	    	ima_tag_count->setInitializer(const_int32_0);
 	    	return true;
 	    }
-
-//	    void instrumentCheck(BasicBlock *bb, LoadInst *li, GetElementPtrInst *gepi, Instruction *next){
-//	    	Module* m = bb->getParent()->getParent();
-//	    	LLVMContext &context = bb->getContext();
-//	    	Constant* function_check = NULL;
-//	    	std::vector<Value*> arguments_check;
-//	    	//DYTAN_check(i8* %pointer, i8* %memory)
-//	    	function_check = m->getOrInsertFunction("DYTAN_check", Type::getVoidTy(context),  Type::getInt8PtrTy(context), Type::getInt8PtrTy(context), (Type *)0 );
-//	    	Function *check_function_check = dyn_cast<Function>(function_check);
-//	    	CastInst* bitcast_inst_first = new BitCastInst(li, Type::getInt8PtrTy(context), "", next);
-//	    	CastInst* bitcast_inst_second = new BitCastInst(gepi, Type::getInt8PtrTy(context), "", next);
-//	    	arguments_check.push_back(bitcast_inst_first);
-//	    	arguments_check.push_back(bitcast_inst_second);
-//	    	CallInst::Create(check_function_check, arguments_check, "", next);
-//	    }
 
 	    bool instrumentMalloc(BasicBlock* bb, CallInst *ci){
 	    	//allocating vector of store instruction of allocated pointer
