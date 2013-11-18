@@ -1,0 +1,9 @@
+-changed pin makefile.gnu.config by making relative paths be absolute paths
+-included cstring in config_parser.cpp
+-changed elif to else in instrument_functions.c
+-changed fprint in include/BasicBlock.H
+-included sdlib.h in monitor_network.cpp
+-included cstdlib in taint_generator.h
+-added parenteses to instrument_functions.c
+-changed run-dytan to execute with bash and have pin executable at right location
+-the config.xml needs to be in the folder where you are running dytan not in the folder of the executable of the file

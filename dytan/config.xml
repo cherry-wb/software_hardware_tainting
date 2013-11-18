@@ -1,0 +1,27 @@
+<dytan-config>
+    <sources>
+        <source type="path">
+            <file>runs/polymorph-0.4.0/BBB</file>
+            <granularity>PerRead</granularity>
+        </source>
+        <taint-marks>8</taint-marks>
+    </sources>
+    <propagation>
+        <dataflow>true</dataflow>
+        <controlflow>false</controlflow>
+    </propagation>
+    <sinks>
+        <sink>
+            <id>36</id>
+            <location type="instruction">
+                <instruction>ret</instruction>
+                <instruction>jmp</instruction>
+            </location>
+            <action>validate-absence</action>
+        </sink>
+    </sinks>
+    <profiling>
+	<marks>false</marks>
+	<markop>true</markop>
+    </profiling>
+</dytan-config>

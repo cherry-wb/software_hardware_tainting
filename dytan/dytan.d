@@ -1,0 +1,116 @@
+dytan.o: dytan.cpp include/dytan.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/pin.H \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/compiler_version_check2.H \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/cc_used_ia32_l.CVH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/level_base.PLH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/foundation.PLH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/types_marker.TLH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/types_foundation.TLH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/pin_api_version.TLH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/pin-errtype.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-iclass-enum.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-common-hdrs.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-category-enum.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/types_base.TLH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/message.PH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/util.PH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/knob.PH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/lock.PH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/reg_ia32.PH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/reg_partial_ia32.PH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/base_ia32.PH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/tls.PH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/exception.PH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/child_process.PH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/level_core.PLH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-types.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/types_core.TLH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/val.PH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/sec.PH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/img.PH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/bbl.PH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/edg.PH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/ins.PH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/ins_ia32.PH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/ins_syscall_ia32_unix.PH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/ins_api_xed_ia32.PH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/ins_xed_ia32.PH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/operand_ia32.PH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/level_vmapi.PLH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/types_vmapi.TLH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/level_pinclient.PLH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/client_asm_ia32.PH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/pin_client.PH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/debugger_client.PH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/deprecated_client.PH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/opin_client.PH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/tls_client.PH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/child_process_client.PH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/cache_client.PH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/image.PH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/debug.PH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/image_elf.PH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/symbol_elf.PH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/debug_elf.PH \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/source/include/gen/probe_instrument.PH \
+ include/bitset.h include/taint_generator.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-interface.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-types.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-operand-enum.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-init.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-decode.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-decoded-inst.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-common-defs.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-portability.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-util.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-operand-values-interface.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-state.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-address-width-enum.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-machine-mode-enum.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-operand-storage.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-reg-enum.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-iclass-enum.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-inst.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-category-enum.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-extension-enum.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-operand-visibility-enum.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-operand-action-enum.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-operand-convert-enum.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-operand-type-enum.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-nonterminal-enum.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-operand-width-enum.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-operand-element-xtype-enum.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-attribute-enum.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-iform-enum.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-iform-map.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-isa-set-enum.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-gen-table-defs.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-flags.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-flag-enum.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-flag-action-enum.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-encoder-gen-defs.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-chip-enum.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-operand-element-type-enum.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-error-enum.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-decode-cache.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-syntax-enum.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-reg-class-enum.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-reg-class.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-inst-printer.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-encode.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-encoder-iforms.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-encoder-hl.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-operand-action.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-version.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-disas.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-format-options.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-iformfl-enum.h \
+ /home/mattia/PhD/Software/pin-2.7-29972-gcc.3.4.6-ia32_intel64-linux/extras/xed2-ia32/include/xed-agen.h \
+ include/config_parser.h include/syscall_monitor.H \
+ include/replace_functions.h include/dytan.h include/syscall_functions.h \
+ include/syscall_monitor.H include/RoutineGraph.H include/BasicBlock.H \
+ include/BasicBlock.H include/taint_func_args.h include/taint_source.h \
+ include/taint_source_path.h include/taint_source.h \
+ include/monitor_path.h include/taint_source_network.h \
+ include/monitor_network.h include/taint_source_func.h \
+ instrument_functions.c

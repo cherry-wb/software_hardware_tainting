@@ -1,0 +1,22 @@
+pointer 0xbff523cc
+memory 0x8e90008
+Random string: 
+pointer 0xbff523cc
+memory 0x8e90008
+Looking at img: /home/mattia/PhD/Software/dytan/sample/ptr/ptr_instrumented
+Could not replace: DYTAN_set_trace
+Could not replace: DYTAN_display
+Could not replace: DYTAN_tag
+Replaced: DYTAN_tag_pointer
+Replaced: DYTAN_tag_memory
+Replaced: DYTAN_free
+Could not replace: DYTAN_check
+input 0xbff52410
+input 0xbff524b4
+input 0xbff524b8
+assigning tag to pointer bff523cc-bff523cf taint marks [3]
+assigning tag to memory 8e90008-8e90010 taint marks [3]
+cleared tag for memory8e90008-8e90010
+assigning tag to pointer bff523cc-bff523cf taint marks [4]
+assigning tag to memory 8e90008-8e90019 taint marks [4]
+cleared tag for memory8e90008-8e9001a
