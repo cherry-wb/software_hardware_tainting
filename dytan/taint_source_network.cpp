@@ -142,8 +142,7 @@ void networkReadCallbackPerRead(NetworkAddress networkAddr, ADDRINT start, size_
 
 void networkReadDefault(NetworkAddress networkAddr, ADDRINT start, size_t length, void *v)
 {
-    printf("Read from  \n ");
+    //printf("Read from  \n ");
     //clear taint marks
-
 }
 

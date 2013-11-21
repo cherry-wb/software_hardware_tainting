@@ -1474,15 +1474,15 @@ void SetNewTaintForMemory(ADDRINT addr, ADDRINT size, int taint_mark)
 
 #ifdef TRACE
     const char *sep = "";
-    log << "@" << std::hex << addr << "-" << std::hex <<  addr + size -1 << "[";
+    //log << "@" << std::hex << addr << "-" << std::hex <<  addr + size -1 << "[";
     for(int i = 0; i < (int)tmp->nbits; i++) {
         if(bitset_test_bit(tmp, i)) {
-            log << sep << i;
+            //log << sep << i;
             sep = ", ";
         }
     }
-    log << "]\n";
-    log.flush();
+    //log << "]\n";
+    //log.flush();
 #endif
     
     //taintAssignmentLog << taint_mark << " ->" << std::hex << addr << "-" << std::hex << addr + size - 1 << "\n";
@@ -1502,7 +1502,27 @@ FunctionTaintSource *func_source;
 
 int set_framework_options(config *conf, SyscallMonitor *monitor)
 {
-    
+
+	//initialization
+	if(conf->sources.size()==0){
+		//basic set up
+		path_source = new PathTaintSource(monitor, false);
+		network_source = new NetworkTaintSource(monitor, false);
+		func_source = new FunctionTaintSource();
+        if (!conf->num_markings.compare("1")) {
+            taintGen = new ConstantTaintGenerator(5);
+        } else if (conf->num_markings.compare("")) {
+            int num = convertTo<int>(conf->num_markings);
+            if (num < 1 || num > NUMBER_OF_TAINT_MARKS) {
+                cout << "Incorrect number of taint marks specified";
+                exit(1);
+            }
+            NUMBER_OF_TAINT_MARKS = num;
+            taintGen = new TaintGenerator(0, num);
+        }
+	}
+
+	//case in which I have moultiple sources
     vector<source>::iterator itr = conf->sources.begin();
     // Iterate through all the taint sources
     while (itr != conf->sources.end()) {
@@ -1515,6 +1535,8 @@ int set_framework_options(config *conf, SyscallMonitor *monitor)
         } else if (!src.granularity.compare("PerByte")) {
             taint_granularity = PerByte;
         }
+
+
         if (!conf->num_markings.compare("1")) {
             taintGen = new ConstantTaintGenerator(5);
         } else if (conf->num_markings.compare("")) { 
@@ -1526,6 +1548,8 @@ int set_framework_options(config *conf, SyscallMonitor *monitor)
             NUMBER_OF_TAINT_MARKS = num;
             taintGen = new TaintGenerator(0, num);
         }
+
+
         if (!src.type.compare("path")) {
             if(!src.details[0].compare("*")) {
                 path_source = new PathTaintSource(monitor, true);
@@ -1552,11 +1576,13 @@ int set_framework_options(config *conf, SyscallMonitor *monitor)
             }
         } else if (!src.type.compare("function")) {
             func_source = new FunctionTaintSource();
+            //mattia return value of function is tainted
             //func_source->addFunctionSource("funcname", num_taint_marks);  //TODO: remove hard coding
         } else {
             std::cout << "Invalid source type";
         }
     }
+
     propagation prop = conf->prop;
 
     return 0;
@@ -1639,7 +1665,7 @@ int main(int argc, char **argv)
     if(profiling_markop){
     	prof_log.open("prof.log");
     	PIN_AddFiniFunction	(PrintProfilingResult,0);
-    	word = false;
+    	word = true;
     	word_size=4;
     }
     
@@ -1734,7 +1760,7 @@ int main(int argc, char **argv)
     instrument_functions[XED_ICLASS_JNL] = &Instrument_Jcc; //55
     instrument_functions[XED_ICLASS_JLE] = &Instrument_Jcc; //56
     instrument_functions[XED_ICLASS_JNLE] = &Instrument_Jcc; //57
-
+    instrument_functions[XED_ICLASS_CMOVNLE] = &Instrument_CMOVcc; //58
     instrument_functions[XED_ICLASS_TEST] = &Instrument_TEST; //59
     instrument_functions[XED_ICLASS_XCHG] = &Instrument_XCHG; //60
     instrument_functions[XED_ICLASS_MOV] = &Instrument_MOV; //61
@@ -1747,6 +1773,7 @@ int main(int argc, char **argv)
     instrument_functions[XED_ICLASS_CDQ] = &Instrument_CDQ; //70
     //  instrument_functions[XED_ICLASS_CALL_FAR] = &Instrument_CALL_FAR; //71
     //  instrument_functions[XED_ICLASS_WAIT] = &Instrument_WAIT; //72
+    instrument_functions[XED_ICLASS_CMPSW] = &Instrument_CMPSW;//73
 
     instrument_functions[XED_ICLASS_PUSHFD] = &Instrument_PUSHFD; //74
 
@@ -1756,7 +1783,6 @@ int main(int argc, char **argv)
     instrument_functions[XED_ICLASS_LAHF] = &Instrument_LAHF; //80
     instrument_functions[XED_ICLASS_MOVSB] = &Instrument_MOVSB; //81
     instrument_functions[XED_ICLASS_MOVSW] = &Instrument_MOVSW; //82
-    instrument_functions[XED_ICLASS_MOVSD] = &Instrument_MOVSD; //83
 
     instrument_functions[XED_ICLASS_CMPSB] = &Instrument_CMPSB; //85
 
@@ -1862,14 +1888,22 @@ int main(int argc, char **argv)
     //  instrument_functions[XED_ICLASS_PMULUDQ] = &Instrument_PMULUDQ; //273
 
     //  instrument_functions[XED_ICLASS_UD2] = &Instrument_UD2; //281
-
-    instrument_functions[XED_ICLASS_CMOVS] = &Instrument_CMOVcc; //307
+    instrument_functions[XED_ICLASS_MOVAPS] = &Instrument_MOVAPS;//301
+    instrument_functions[XED_ICLASS_MOVD] = &Instrument_MOVD;//303
+    instrument_functions[XED_ICLASS_MOVDQA] = &Instrument_MOVDQA;//306
+    instrument_functions[XED_ICLASS_MOVDQU] = &Instrument_MOVDQU;//307
+    instrument_functions[XED_ICLASS_CMOVS] = &Instrument_CMOVcc;
     instrument_functions[XED_ICLASS_CMOVNS] = &Instrument_CMOVcc; //308
-
-    instrument_functions[XED_ICLASS_CMOVL] = &Instrument_CMOVcc; //311
+    instrument_functions[XED_ICLASS_MOVHPD] = &Instrument_MOVHPD;//311
+    instrument_functions[XED_ICLASS_CMOVL] = &Instrument_CMOVcc;
     instrument_functions[XED_ICLASS_CMOVNL] = &Instrument_CMOVcc; //312
     instrument_functions[XED_ICLASS_CMOVLE] = &Instrument_CMOVcc; //313
-    instrument_functions[XED_ICLASS_CMOVNLE] = &Instrument_CMOVcc; //314
+    instrument_functions[XED_ICLASS_MOVLPD] = &Instrument_MOVLPD; //314
+    instrument_functions[XED_ICLASS_MOVQ] = &Instrument_MOVQ; //324
+
+    instrument_functions[XED_ICLASS_MOVSD] = &Instrument_MOVSD; //mattia 327
+
+    instrument_functions[XED_ICLASS_MOVSD_XMM] = &Instrument_MOVSD_XMM; //mattia 328
 
     instrument_functions[XED_ICLASS_MUL] = &Instrument_MUL; //mattia 342
 
@@ -1892,10 +1926,12 @@ int main(int argc, char **argv)
     instrument_functions[XED_ICLASS_BSR] = &Instrument_BSR; //377
     instrument_functions[XED_ICLASS_MOVSX] = &Instrument_MOVSX; //378
     instrument_functions[XED_ICLASS_BSWAP] = &Instrument_BSWAP; //379
+    instrument_functions[XED_ICLASS_PALIGNR] = &Instrument_PALIGNR;//381
 
     //instrument_functions[XED_ICLASS_PAND] = &Instrument_PAND; //383
 
     //instrument_functions[XED_ICLASS_PSUBSW] = &Instrument_PSUBSW; //389
+
 
 
     instrument_functions[XED_ICLASS_PCMPEQB] = &Instrument_PCMPEQB; //mattia 391
@@ -1913,10 +1949,13 @@ int main(int argc, char **argv)
     instrument_functions[XED_ICLASS_NEG] = &Instrument_NEG; //480
     //instrument_functions[XED_ICLASS_POR] = &Instrument_POR; //mattia 481
     instrument_functions[XED_ICLASS_DIV] = &Instrument_DIV; //482
-    instrument_functions[XED_ICLASS_IDIV] = &Instrument_IDIV; //483
+    instrument_functions[XED_ICLASS_PREFETCHT0] = &Instrument_PREFETCHT0;//483
+    instrument_functions[XED_ICLASS_IDIV] = &Instrument_IDIV;
+    instrument_functions[XED_ICLASS_PSHUFD] = &Instrument_PSHUFD; //491
 
     instrument_functions[XED_ICLASS_LDMXCSR] = &Instrument_LDMXCSR; //507
-    instrument_functions[XED_ICLASS_STMXCSR] = &Instrument_STMXCSR; //508
+    instrument_functions[XED_ICLASS_STMXCSR] = &Instrument_STMXCSR;
+    instrument_functions[XED_ICLASS_PSUBB] = &Instrument_PSUBB; //508
 
     instrument_functions[XED_ICLASS_FDIV] = &Instrument_FDIV;
     instrument_functions[XED_ICLASS_FLD] = &Instrument_FLD; //523
@@ -1941,6 +1980,8 @@ int main(int argc, char **argv)
     instrument_functions[XED_ICLASS_FIDIVR] = &EmptyHandler; //566
     instrument_functions[XED_ICLASS_FIADD] = &EmptyHandler; //559
     instrument_functions[XED_ICLASS_FIST] = &EmptyHandler; //574
+    instrument_functions[XED_ICLASS_XORPS] = &Instrument_XORPS; //644
+
 
     // instructions that compare real numbers and set the eflags register
     instrument_functions[XED_ICLASS_FCOMI] = &Instrument_Eflags;
@@ -2002,6 +2043,15 @@ int main(int argc, char **argv)
     monitor->addObserver(SYS_poll, Handle_POLL, 0);
     monitor->addObserver(SYS_gettid, Handle_GETTID, 0);
     monitor->addObserver(SYS_tgkill, Handle_TGKILL, 0);
+    monitor->addObserver(SYS_getgid32, Handle_GETGID32, 0);
+    monitor->addObserver(SYS_geteuid32, Handle_GETEUID32, 0);
+    monitor->addObserver(SYS_getegid32, Handle_GETEGID32, 0);
+    monitor->addObserver(SYS_getdents, Handle_GETDENTS, 0);
+    monitor->addObserver(SYS_clone, Handle_CLONE, 0);
+    monitor->addObserver(SYS_dup2, Handle_DUP2, 0);
+    monitor->addObserver(SYS_waitpid, Handle_WAITPID, 0);
+    monitor->addObserver(SYS_set_tid_address, Handle_SET_TID_ADDRESS, 0);
+    monitor->addObserver(SYS_chown32, Handle_CHOWN32, 0);
 
     // never returns
     PIN_StartProgram();

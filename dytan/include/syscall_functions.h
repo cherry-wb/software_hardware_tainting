@@ -86,6 +86,15 @@ void Handle_ACCESS(INT32 num,syscall_arguments args,void *v);
 void Handle_POLL(INT32 num,syscall_arguments args,void *v);
 void Handle_GETTID(INT32 num, syscall_arguments args, void * v);
 void Handle_TGKILL(INT32 num, syscall_arguments args, void * v);
+void Handle_GETGID32(INT32 num, syscall_arguments args, void * v);
+void Handle_GETEUID32(INT32 num, syscall_arguments args, void * v);
+void Handle_GETEGID32(INT32 num, syscall_arguments args, void * v);
+void Handle_GETDENTS(INT32 num, syscall_arguments args, void * v);
+void Handle_CLONE(INT32 num, syscall_arguments args, void * v);
+void Handle_DUP2(INT32 num, syscall_arguments args, void * v);
+void Handle_WAITPID(INT32 num, syscall_arguments args, void * v);
+void Handle_SET_TID_ADDRESS(INT32 num, syscall_arguments args, void * v);
+void Handle_CHOWN32(INT32 num, syscall_arguments args, void * v);
 void UnimplementedSystemCall(INT32 num,syscall_arguments args,void *v);
 extern map<int,string>openFiles;
 

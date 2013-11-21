@@ -1544,8 +1544,91 @@ static void Instrument_MOVSB(INS ins, void *v)
 
 static void Instrument_MOVSD(INS ins, void *v)
 {
-  
     Instrument_MOVS(ins, v);
+}
+
+static void Instrument_MOVSD_XMM(INS ins, void *v)
+{
+	  if(INS_OperandIsReg(ins, 1)) {
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(TaintForRegister),
+			   IARG_ADDRINT, INS_OperandReg(ins, 1),
+			   IARG_PTR, src,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_END);
+	  }
+	  else if(INS_OperandIsMemory(ins, 1)) {
+	    if(!INS_IsMemoryRead(ins)) return;
+
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(TaintForMemory),
+			   IARG_MEMORYREAD_EA, IARG_MEMORYREAD_SIZE,
+			   IARG_ADDRINT, INS_OperandMemoryBaseReg(ins, 1),
+			   IARG_ADDRINT, INS_OperandMemoryIndexReg(ins, 1),
+			   IARG_PTR, src,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_UINT32, 1,
+			   IARG_END);
+	  }
+	  else if(INS_OperandIsImmediate(ins, 1)) {
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(ClearTaintSet),
+			   IARG_PTR, src,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_END);
+	  }
+	  else {
+	      log << "Unknown operand(1) type: " << INS_Disassemble(ins) << "\n";
+	      log.flush();
+	      abort();
+	  }
+
+	  //TPS
+
+	  //dest <- src
+	  if(INS_OperandIsReg(ins, 0)) {
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(SetTaintForRegister),
+			   IARG_ADDRINT, INS_OperandReg(ins, 0),
+			   IARG_UINT32, INS_Opcode(ins),
+	           IARG_UINT32, 1,
+	           IARG_UINT32, 1,
+			   IARG_PTR, src,
+			   IARG_END);
+	  }
+	  else if(INS_OperandIsMemory(ins, 0)) {
+	#ifdef IMPLICIT
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(TaintForRegister),
+			   IARG_ADDRINT, INS_OperandMemoryBaseReg(ins, 0),
+			   IARG_PTR, base,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_END);
+
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(TaintForRegister),
+			   IARG_ADDRINT, INS_OperandMemoryIndexReg(ins, 0),
+			   IARG_PTR, idx,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_END);
+	#endif
+	    if(!INS_IsMemoryWrite(ins)) return;
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(SetTaintForMemory),
+			   IARG_MEMORYWRITE_EA, IARG_MEMORYWRITE_SIZE,
+			   IARG_UINT32, INS_Opcode(ins),
+	           IARG_UINT32, 1,
+	#ifdef IMPLICIT
+	           IARG_UINT32, 3,
+	//#elif //mattia
+	#else
+	           IARG_UINT32, 1,
+	#endif
+	           IARG_PTR, src,
+	#ifdef IMPLICIT
+			   IARG_PTR, base,
+			   IARG_PTR, idx,
+	#endif
+			   IARG_END);
+	  }
+	  else {
+	      log << "Unknown operand(0) type: " << INS_Disassemble(ins) << "\n";
+	      log.flush();
+	      abort();
+	  }
 }
 
 static void Instrument_MOVSW(INS ins, void *v)
@@ -2880,15 +2963,551 @@ static void Instrument_PXOR(INS ins, void *v)
 //added to support strlen
 static void Instrument_PCMPEQB(INS ins, void *v)
 {
-//    //TODO : implement
-//	prof_log << "TODO:" << INS_Disassemble(ins) << "\n";
-//	prof_log.flush();
+	//mattia
+	  if(INS_OperandIsReg(ins, 0)) {
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(TaintForRegister),
+			   IARG_ADDRINT, INS_OperandReg(ins, 0),
+			   IARG_PTR, dest,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_END);
+	  }
+	  else if(INS_OperandIsMemory(ins, 0)) {
+	    if(!INS_IsMemoryRead(ins)) return;
+
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(TaintForMemory),
+			   IARG_MEMORYREAD_EA, IARG_MEMORYREAD_SIZE,
+			   IARG_ADDRINT, INS_OperandMemoryBaseReg(ins, 0),
+			   IARG_ADDRINT, INS_OperandMemoryIndexReg(ins, 0),
+			   IARG_PTR, dest,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_UINT32, 1,
+			   IARG_END);
+	  }
+	  else {
+	      log << "Unknown operand(0) type: " << INS_Disassemble(ins) << "\n";
+	      log.flush();
+	      abort();
+	  }
+
+	  if(INS_OperandIsReg(ins, 1)) {
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(TaintForRegister),
+			   IARG_ADDRINT, INS_OperandReg(ins, 1),
+			   IARG_PTR, src,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_END);
+	  }
+	  else if(INS_OperandIsMemory(ins, 1)) {
+	    if(!INS_IsMemoryRead(ins)) return;
+
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(TaintForMemory),
+			   IARG_MEMORYREAD_EA, IARG_MEMORYREAD_SIZE,
+			   IARG_ADDRINT, INS_OperandMemoryBaseReg(ins, 1),
+			   IARG_ADDRINT, INS_OperandMemoryIndexReg(ins, 1),
+			   IARG_PTR, src,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_UINT32, 1,
+			   IARG_END);
+	  }
+	  else if(INS_OperandIsImmediate(ins, 1)) {
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(ClearTaintSet),
+			   IARG_PTR, src,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_END);
+	  }
+	  else {
+	      log << "Unknown operand(1) type: " << INS_Disassemble(ins) << "\n";
+	      log.flush();
+	      abort();
+	  }
+
+	  //TPS
+
+	  //dest <- dest, src
+	  if(INS_OperandIsReg(ins, 0)) {
+
+		//taint propagation
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(SetTaintForRegister),
+			   IARG_ADDRINT, INS_OperandReg(ins, 0),
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_UINT32, 1,
+	           IARG_UINT32, 2,
+			   IARG_PTR, dest,
+			   IARG_PTR, src,
+			   IARG_END);
+	  }
+	  else if(INS_OperandIsMemory(ins, 0)) {
+	    if(!INS_IsMemoryWrite(ins)) return;
+
+	    //taint propagation
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(SetTaintForMemory),
+			   IARG_MEMORYWRITE_EA, IARG_MEMORYWRITE_SIZE,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_UINT32, 1,
+	           IARG_UINT32, 2,
+			   IARG_PTR, dest,
+			   IARG_PTR, src,
+			   IARG_END);
+	  }
+	  else {
+	      log << "Unknown operand(0) type: " << INS_Disassemble(ins) << "\n";
+	      log.flush();
+	    abort();
+	  }
 }
 
 //added to support strlen
 static void Instrument_PMOVMSKB(INS ins, void *v)
 {
-//    //TODO : implement
-//	prof_log << "TODO:" << INS_Disassemble(ins) << "\n";
-//	prof_log.flush();
+  //mattia
+	  if(INS_OperandIsReg(ins, 1)) {
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(TaintForRegister),
+			   IARG_ADDRINT, INS_OperandReg(ins, 1),
+			   IARG_PTR, src,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_END);
+	  }
+	  else if(INS_OperandIsMemory(ins, 1)) {
+	    if(!INS_IsMemoryRead(ins)) return;
+
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(TaintForMemory),
+			   IARG_MEMORYREAD_EA, IARG_MEMORYREAD_SIZE,
+			   IARG_ADDRINT, INS_OperandMemoryBaseReg(ins, 1),
+			   IARG_ADDRINT, INS_OperandMemoryIndexReg(ins, 1),
+			   IARG_PTR, src,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_UINT32, 1,
+			   IARG_END);
+	  }
+	  else if(INS_OperandIsImmediate(ins, 1)) {
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(ClearTaintSet),
+			   IARG_PTR, src,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_END);
+	  }
+	  else {
+	      log << "Unknown operand(1) type: " << INS_Disassemble(ins) << "\n";
+	      log.flush();
+	      abort();
+	  }
+
+	  //TPS
+
+	  //dest <- src
+	  if(INS_OperandIsReg(ins, 0)) {
+
+		//taint propagation
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(SetTaintForRegister),
+			   IARG_ADDRINT, INS_OperandReg(ins, 0),
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_UINT32, 1,
+	           IARG_UINT32, 1,
+			   IARG_PTR, src,
+			   IARG_END);
+	  }
+	  else if(INS_OperandIsMemory(ins, 0)) {
+	    if(!INS_IsMemoryWrite(ins)) return;
+
+	    //taint propagation
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(SetTaintForMemory),
+			   IARG_MEMORYWRITE_EA, IARG_MEMORYWRITE_SIZE,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_UINT32, 1,
+	           IARG_UINT32, 1,
+			   IARG_PTR, src,
+			   IARG_END);
+	  }
+	  else {
+	      log << "Unknown operand(0) type: " << INS_Disassemble(ins) << "\n";
+	      log.flush();
+	    abort();
+	  }
 }
+
+static void Instrument_MOVHPD(INS ins, void *v)
+{
+  //mattia
+  Instrument_MOV(ins, v);
+}
+
+static void Instrument_MOVLPD(INS ins, void *v)
+{
+  //mattia
+  Instrument_MOV(ins, v);
+}
+static void Instrument_PSUBB(INS ins, void *v)
+{
+  //mattia
+  Instrument_ADD(ins, v);
+}
+
+static void Instrument_MOVDQA(INS ins, void *v)
+{
+  //mattia
+  Instrument_MOV(ins, v);
+}
+
+static void Instrument_MOVDQU(INS ins, void *v)
+{
+  //mattia
+  Instrument_MOV(ins, v);
+}
+
+static void Instrument_MOVAPS(INS ins, void *v)
+{
+  //mattia
+  Instrument_MOV(ins, v);
+}
+
+static void Instrument_PALIGNR(INS ins, void *v){
+	//mattia
+	  if(INS_OperandIsReg(ins, 0)) {
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(TaintForRegister),
+			   IARG_ADDRINT, INS_OperandReg(ins, 0),
+			   IARG_PTR, dest,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_END);
+	  }
+	  else if(INS_OperandIsMemory(ins, 0)) {
+	    if(!INS_IsMemoryRead(ins)) return;
+
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(TaintForMemory),
+			   IARG_MEMORYREAD_EA, IARG_MEMORYREAD_SIZE,
+			   IARG_ADDRINT, INS_OperandMemoryBaseReg(ins, 0),
+			   IARG_ADDRINT, INS_OperandMemoryIndexReg(ins, 0),
+			   IARG_PTR, dest,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_UINT32, 1,
+			   IARG_END);
+	  }
+	  else {
+	      log << "Unknown operand(0) type: " << INS_Disassemble(ins) << "\n";
+	      log.flush();
+	      abort();
+	  }
+
+	  if(INS_OperandIsReg(ins, 1)) {
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(TaintForRegister),
+			   IARG_ADDRINT, INS_OperandReg(ins, 1),
+			   IARG_PTR, src,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_END);
+	  }
+	  else if(INS_OperandIsMemory(ins, 1)) {
+	    if(!INS_IsMemoryRead(ins)) return;
+
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(TaintForMemory),
+			   IARG_MEMORYREAD_EA, IARG_MEMORYREAD_SIZE,
+			   IARG_ADDRINT, INS_OperandMemoryBaseReg(ins, 1),
+			   IARG_ADDRINT, INS_OperandMemoryIndexReg(ins, 1),
+			   IARG_PTR, src,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_UINT32, 1,
+			   IARG_END);
+	  }
+	  else if(INS_OperandIsImmediate(ins, 1)) {
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(ClearTaintSet),
+			   IARG_PTR, src,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_END);
+	  }
+	  else {
+	      log << "Unknown operand(1) type: " << INS_Disassemble(ins) << "\n";
+	      log.flush();
+	      abort();
+	  }
+
+	  //TPS
+
+	  //dest <- dest, src
+	  if(INS_OperandIsReg(ins, 0)) {
+
+		//taint propagation
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(SetTaintForRegister),
+			   IARG_ADDRINT, INS_OperandReg(ins, 0),
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_UINT32, 1,
+	           IARG_UINT32, 2,
+			   IARG_PTR, dest,
+			   IARG_PTR, src,
+			   IARG_END);
+	  }
+	  else if(INS_OperandIsMemory(ins, 0)) {
+	    if(!INS_IsMemoryWrite(ins)) return;
+
+	    //taint propagation
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(SetTaintForMemory),
+			   IARG_MEMORYWRITE_EA, IARG_MEMORYWRITE_SIZE,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_UINT32, 1,
+	           IARG_UINT32, 2,
+			   IARG_PTR, dest,
+			   IARG_PTR, src,
+			   IARG_END);
+	  }
+	  else {
+	      log << "Unknown operand(0) type: " << INS_Disassemble(ins) << "\n";
+	      log.flush();
+	    abort();
+	  }
+}
+
+static void Instrument_MOVD(INS ins, void *v)
+{
+  //mattia
+  Instrument_MOV(ins, v);
+}
+
+static void Instrument_PSHUFD(INS ins, void *v){
+	//mattia
+	  if(INS_OperandIsReg(ins, 0)) {
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(TaintForRegister),
+			   IARG_ADDRINT, INS_OperandReg(ins, 0),
+			   IARG_PTR, dest,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_END);
+	  }
+	  else if(INS_OperandIsMemory(ins, 0)) {
+	    if(!INS_IsMemoryRead(ins)) return;
+
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(TaintForMemory),
+			   IARG_MEMORYREAD_EA, IARG_MEMORYREAD_SIZE,
+			   IARG_ADDRINT, INS_OperandMemoryBaseReg(ins, 0),
+			   IARG_ADDRINT, INS_OperandMemoryIndexReg(ins, 0),
+			   IARG_PTR, dest,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_UINT32, 1,
+			   IARG_END);
+	  }
+	  else {
+	      log << "Unknown operand(0) type: " << INS_Disassemble(ins) << "\n";
+	      log.flush();
+	      abort();
+	  }
+
+	  if(INS_OperandIsReg(ins, 1)) {
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(TaintForRegister),
+			   IARG_ADDRINT, INS_OperandReg(ins, 1),
+			   IARG_PTR, src,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_END);
+	  }
+	  else if(INS_OperandIsMemory(ins, 1)) {
+	    if(!INS_IsMemoryRead(ins)) return;
+
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(TaintForMemory),
+			   IARG_MEMORYREAD_EA, IARG_MEMORYREAD_SIZE,
+			   IARG_ADDRINT, INS_OperandMemoryBaseReg(ins, 1),
+			   IARG_ADDRINT, INS_OperandMemoryIndexReg(ins, 1),
+			   IARG_PTR, src,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_UINT32, 1,
+			   IARG_END);
+	  }
+	  else if(INS_OperandIsImmediate(ins, 1)) {
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(ClearTaintSet),
+			   IARG_PTR, src,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_END);
+	  }
+	  else {
+	      log << "Unknown operand(1) type: " << INS_Disassemble(ins) << "\n";
+	      log.flush();
+	      abort();
+	  }
+
+	  //TPS
+
+	  //dest <- dest, src
+	  if(INS_OperandIsReg(ins, 0)) {
+
+		//taint propagation
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(SetTaintForRegister),
+			   IARG_ADDRINT, INS_OperandReg(ins, 0),
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_UINT32, 1,
+	           IARG_UINT32, 2,
+			   IARG_PTR, dest,
+			   IARG_PTR, src,
+			   IARG_END);
+	  }
+	  else if(INS_OperandIsMemory(ins, 0)) {
+	    if(!INS_IsMemoryWrite(ins)) return;
+
+	    //taint propagation
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(SetTaintForMemory),
+			   IARG_MEMORYWRITE_EA, IARG_MEMORYWRITE_SIZE,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_UINT32, 1,
+	           IARG_UINT32, 2,
+			   IARG_PTR, dest,
+			   IARG_PTR, src,
+			   IARG_END);
+	  }
+	  else {
+	      log << "Unknown operand(0) type: " << INS_Disassemble(ins) << "\n";
+	      log.flush();
+	    abort();
+	  }
+}
+
+static void Instrument_MOVQ(INS ins, void *v)
+{
+  //mattia
+  Instrument_MOV(ins, v);
+}
+
+static void Instrument_PREFETCHT0(INS ins, void *v)
+{
+  //mattia
+}
+
+static void Instrument_CMPSW(INS ins, void *v)
+{
+  //mattia
+  int operand_count = 0;
+  for(unsigned int i = 0; i < INS_OperandCount(ins); i++) {
+	  if(!INS_OperandIsImplicit(ins, i)) operand_count++;
+  }
+
+  if(operand_count==2){
+	  Instrument_CMP(ins, v);
+  }
+  if(operand_count==1){
+	  if(INS_OperandIsReg(ins, 0)) {
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(TaintForRegister),
+			   IARG_ADDRINT, INS_OperandReg(ins, 0),
+			   IARG_PTR, dest,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_END);
+	  }
+	  else if(INS_OperandIsMemory(ins, 0)) {
+	    if(!INS_IsMemoryRead(ins)) return;
+
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(TaintForMemory),
+			   IARG_MEMORYREAD_EA, IARG_MEMORYREAD_SIZE,
+			   IARG_ADDRINT, INS_OperandMemoryBaseReg(ins, 0),
+			   IARG_ADDRINT, INS_OperandMemoryIndexReg(ins, 0),
+			   IARG_PTR, dest,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_UINT32, 1,
+			   IARG_END);
+	  }
+	  else {
+	      log << "Unknown operand(0) type: " << INS_Disassemble(ins) << "\n";
+	      log.flush();
+	      abort();
+	  }
+
+	  //TPS
+
+	  //eflags <- dest
+	  INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(SetTaintForRegister),
+			 IARG_ADDRINT, LEVEL_BASE::REG_EFLAGS,
+			 IARG_UINT32, INS_Opcode(ins),
+			 IARG_UINT32, 1,
+	         IARG_UINT32, 1,
+			 IARG_PTR, dest,
+			 IARG_END);
+  }
+}
+
+static void Instrument_XORPS(INS ins, void *v){
+	//mattia
+	  if(INS_OperandIsReg(ins, 0)) {
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(TaintForRegister),
+			   IARG_ADDRINT, INS_OperandReg(ins, 0),
+			   IARG_PTR, dest,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_END);
+	  }
+	  else if(INS_OperandIsMemory(ins, 0)) {
+	    if(!INS_IsMemoryRead(ins)) return;
+
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(TaintForMemory),
+			   IARG_MEMORYREAD_EA, IARG_MEMORYREAD_SIZE,
+			   IARG_ADDRINT, INS_OperandMemoryBaseReg(ins, 0),
+			   IARG_ADDRINT, INS_OperandMemoryIndexReg(ins, 0),
+			   IARG_PTR, dest,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_UINT32, 1,
+			   IARG_END);
+	  }
+	  else {
+	      log << "Unknown operand(0) type: " << INS_Disassemble(ins) << "\n";
+	      log.flush();
+	      abort();
+	  }
+
+	  if(INS_OperandIsReg(ins, 1)) {
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(TaintForRegister),
+			   IARG_ADDRINT, INS_OperandReg(ins, 1),
+			   IARG_PTR, src,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_END);
+	  }
+	  else if(INS_OperandIsMemory(ins, 1)) {
+	    if(!INS_IsMemoryRead(ins)) return;
+
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(TaintForMemory),
+			   IARG_MEMORYREAD_EA, IARG_MEMORYREAD_SIZE,
+			   IARG_ADDRINT, INS_OperandMemoryBaseReg(ins, 1),
+			   IARG_ADDRINT, INS_OperandMemoryIndexReg(ins, 1),
+			   IARG_PTR, src,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_UINT32, 1,
+			   IARG_END);
+	  }
+	  else if(INS_OperandIsImmediate(ins, 1)) {
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(ClearTaintSet),
+			   IARG_PTR, src,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_END);
+	  }
+	  else {
+	      log << "Unknown operand(1) type: " << INS_Disassemble(ins) << "\n";
+	      log.flush();
+	      abort();
+	  }
+
+	  //TPS
+
+	  //dest <- dest, src
+	  if(INS_OperandIsReg(ins, 0)) {
+
+		//taint propagation
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(SetTaintForRegister),
+			   IARG_ADDRINT, INS_OperandReg(ins, 0),
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_UINT32, 1,
+	           IARG_UINT32, 2,
+			   IARG_PTR, dest,
+			   IARG_PTR, src,
+			   IARG_END);
+	  }
+	  else if(INS_OperandIsMemory(ins, 0)) {
+	    if(!INS_IsMemoryWrite(ins)) return;
+
+	    //taint propagation
+	    INS_InsertCall(ins, IPOINT_BEFORE, AFUNPTR(SetTaintForMemory),
+			   IARG_MEMORYWRITE_EA, IARG_MEMORYWRITE_SIZE,
+			   IARG_UINT32, INS_Opcode(ins),
+			   IARG_UINT32, 1,
+	           IARG_UINT32, 2,
+			   IARG_PTR, dest,
+			   IARG_PTR, src,
+			   IARG_END);
+	  }
+	  else {
+	      log << "Unknown operand(0) type: " << INS_Disassemble(ins) << "\n";
+	      log.flush();
+	    abort();
+	  }
+}
+
+
+
+
+
+
+
+

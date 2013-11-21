@@ -1,0 +1,4 @@
+max taint marks = 16
+dataflow :true
+controlflow :false
+markop :true

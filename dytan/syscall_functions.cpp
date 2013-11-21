@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "syscall_functions.h"
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/syscall.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
@@ -485,4 +486,53 @@ void Handle_POLL(INT32 num, syscall_arguments args, void *v)
 {
     //TODO
 }
+
+void Handle_GETGID32(INT32 num, syscall_arguments args, void * v)
+{
+	//pass
+}
+
+void Handle_GETEUID32(INT32 num, syscall_arguments args, void * v)
+{
+	//pass
+}
+
+void Handle_GETEGID32(INT32 num, syscall_arguments args, void * v)
+{
+	//pass
+}
+
+void Handle_GETDENTS(INT32 num, syscall_arguments args, void * v)
+{
+	//pass
+}
+
+void Handle_CLONE(INT32 num, syscall_arguments args, void * v)
+{
+	//pass
+}
+
+void Handle_DUP2(INT32 num, syscall_arguments args, void * v)
+{
+	//pass
+}
+
+void Handle_WAITPID(INT32 num, syscall_arguments args, void * v)
+{
+	//pass
+}
+
+void Handle_SET_TID_ADDRESS(INT32 num, syscall_arguments args, void * v)
+{
+	//pass
+}
+
+void Handle_CHOWN32(INT32 num, syscall_arguments args, void * v)
+{
+	//pass
+}
+
+
+
+
 

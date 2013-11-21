@@ -1,0 +1,2 @@
+add to environment gzip variable to trigger malloc in gzip
+export GZIP="-f"

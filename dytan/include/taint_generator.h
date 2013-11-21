@@ -82,6 +82,10 @@ class TaintGenerator
     	return _current;
     }
 
+    virtual int getMax(){
+    	return _max;
+    }
+
     virtual ~TaintGenerator() {}
 
 };

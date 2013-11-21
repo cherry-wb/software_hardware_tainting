@@ -111,13 +111,13 @@ void parsePropagation(xmlDocPtr doc, xmlNodePtr cur, config *conf)
     while (cur != NULL) {
 	if((!xmlStrcmp(cur->name, (const xmlChar *)"dataflow"))) {
 	    key = xmlNodeListGetString(doc, cur->xmlChildrenNode, 1);
-	    log << "\ndataflow :" <<key;
+	    log << "dataflow :" <<key << "\n";
             prop.dataflow = (!strcmp((char *)key, "true") ? true: false);
 	    xmlFree(key);
 	}
         else if ((!xmlStrcmp(cur->name, (const xmlChar *)"controlflow"))) {
 	    key = xmlNodeListGetString(doc, cur->xmlChildrenNode, 1);
-            log << "\ncontrolflow :" << key;
+            log << "controlflow :" << key << "\n";
             prop.controlflow = (!strcmp((char *)key, "true") ? true: false);
 	    xmlFree(key);
 	}
@@ -139,13 +139,13 @@ void parseProfiling(xmlDocPtr doc, xmlNodePtr cur, config *conf)
     while (cur != NULL) {
 	if((!xmlStrcmp(cur->name, (const xmlChar *)"marks"))) {
 	    key = xmlNodeListGetString(doc, cur->xmlChildrenNode, 1);
-	    log << "\nmarks :" <<key << "\n\n";
+	    log << "marks :" <<key << "\n";
             prof.marks = (!strcmp((char *)key, "true") ? true: false);
 	    xmlFree(key);
 	}
 	if((!xmlStrcmp(cur->name, (const xmlChar *)"markop"))) {
 		key = xmlNodeListGetString(doc, cur->xmlChildrenNode, 1);
-		log << "\nmarkop :" <<key << "\n\n";
+		log << "markop :" <<key << "\n";
 		prof.markop = (!strcmp((char *)key, "true") ? true: false);
 		xmlFree(key);
 	}

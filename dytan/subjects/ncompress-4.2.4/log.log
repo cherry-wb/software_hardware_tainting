@@ -1,0 +1,15 @@
+Looking at img: /home/mattia/PhD/Software/dytan/subjects/ncompress-4.2.4/compress_instrumented
+Could not replace: DYTAN_set_trace
+Could not replace: DYTAN_display
+Could not replace: DYTAN_tag
+Replaced: DYTAN_tag_pointer
+Replaced: DYTAN_tag_memory
+Replaced: DYTAN_free
+Could not replace: DYTAN_check
+input 0xbf8089b0
+input 0xbf808a54
+input 0xbf808a58
+assigned tag to pointer bf808988-bf80898b taint marks [3]
+assigned tag to memory 9b72008-9b7200f taint marks [3]
+assigned tag to pointer bf80898c-bf80898f taint marks [3]
+assigned tag to memory 9b72008-9b7200f taint marks [3]

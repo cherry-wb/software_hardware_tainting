@@ -80,7 +80,9 @@ namespace {
 	    		User *ci_user = *ci_use_it;
 	    		if(isa<StoreInst>(ci_user)){
 	    			StoreInst *si = (StoreInst*) ci_user;
-	    			storeinst_vector.push_back(si);
+	    			std::vector<StoreInst*>::iterator storeinst_vector_it;
+	    			storeinst_vector_it = storeinst_vector.begin();
+	    			storeinst_vector.insert(storeinst_vector_it, si);
 	    			continue;
 	    		}
 	    		if(isa<BitCastInst>(ci_user)){
@@ -90,7 +92,12 @@ namespace {
 	    				User *bci_user = *bci_use_it;
 	    	    		if(isa<StoreInst>(bci_user)){
 	    	    			StoreInst *si = (StoreInst*) bci_user;
-	    	    			storeinst_vector.push_back(si);
+	    	    			std::vector<StoreInst*>::iterator storeinst_vector_it;
+	    	    			storeinst_vector_it = storeinst_vector.begin();
+	    	    			storeinst_vector.insert(storeinst_vector_it, si);
+	    	    			continue;
+	    	    		}
+	    	    		if(isa<CmpInst>(bci_user)){
 	    	    			continue;
 	    	    		}
 	    				errs() << "Having a new type of user for bitcast of malloc\n";
@@ -103,6 +110,7 @@ namespace {
 	    			errs() << "Do not know how I can handle return of malloc\n";
 	    			return false;
 	    		}
+
 
 	    		errs() << "Having a new type of user for malloc\n";
 	    		return false;
@@ -117,18 +125,19 @@ namespace {
 			Module* m = bb->getParent()->getParent();
 			LLVMContext &context = bb->getContext();
 
-	    	for(unsigned int i=0; i<storeinst_vector.size();i++){
+			//getting global counter to have different counter for new allocated memory
+			GlobalVariable *ima_tag_count = m->getGlobalVariable("ima_tag_count",true);
+			if(ima_tag_count==NULL){
+				errs() << "Could not get global tag count for IMA\n";
+				return false;
+			}
+			//load counter
+			LoadInst* load_ima_tag_count = new LoadInst(ima_tag_count, "", false, ci->getNextNode());
+
+			//all this store refer to the same malloc so need to have same ima_tag_count
+	    	for(unsigned int i=0; i<storeinst_vector.size(); i++){
 	    		StoreInst *si = storeinst_vector[i];
 				Instruction *next = si->getNextNode();
-
-				//getting global counter to have different counter for new allocated memory
-				GlobalVariable *ima_tag_count = m->getGlobalVariable("ima_tag_count",true);
-				if(ima_tag_count==NULL){
-					errs() << "Could not get global tag count for IMA\n";
-					return false;
-				}
-				//load counter
-				LoadInst* load_ima_tag_count = new LoadInst(ima_tag_count, "", false, next);
 
 				//tagging pointer memory of the pointer returned by malloc
 				CastInst* bitcast_inst = new BitCastInst(si->getOperand(1), Type::getInt8PtrTy(context), "", next);
@@ -158,10 +167,12 @@ namespace {
 				CallInst::Create(tag_function_for_memory, arguments_for_memory, "", next);
 
 
-				//increment counter
-				BinaryOperator* inc_ima_tag_count = BinaryOperator::Create(Instruction::Add, load_ima_tag_count, ConstantInt::get(Type::getInt32Ty(context), 1), "inc", next);
-				StoreInst* store_ima_tag_count = new StoreInst(inc_ima_tag_count, ima_tag_count, false, next);
-				store_ima_tag_count->setAlignment(4);
+				if(i==(storeinst_vector.size()-1)){
+					//increment counter
+					BinaryOperator* inc_ima_tag_count = BinaryOperator::Create(Instruction::Add, load_ima_tag_count, ConstantInt::get(Type::getInt32Ty(context), 1), "inc", next);
+					StoreInst* store_ima_tag_count = new StoreInst(inc_ima_tag_count, ima_tag_count, false, next);
+					store_ima_tag_count->setAlignment(4);
+				}
 	    	}
 
 	    	//storeinst_vector.clear();
@@ -184,7 +195,9 @@ namespace {
 	    		User *ci_user = *ci_use_it;
 	    		if(isa<StoreInst>(ci_user)){
 	    			StoreInst *si = (StoreInst*) ci_user;
-	    			storeinst_vector.push_back(si);
+	    			std::vector<StoreInst*>::iterator storeinst_vector_it;
+	    			storeinst_vector_it = storeinst_vector.begin();
+	    			storeinst_vector.insert(storeinst_vector_it, si);
 	    			continue;
 	    		}
 	    		if(isa<BitCastInst>(ci_user)){
@@ -194,7 +207,12 @@ namespace {
 	    				User *bci_user = *bci_use_it;
 	    	    		if(isa<StoreInst>(bci_user)){
 	    	    			StoreInst *si = (StoreInst*) bci_user;
-	    	    			storeinst_vector.push_back(si);
+	    	    			std::vector<StoreInst*>::iterator storeinst_vector_it;
+	    	    			storeinst_vector_it = storeinst_vector.begin();
+	    	    			storeinst_vector.insert(storeinst_vector_it, si);
+	    	    			continue;
+	    	    		}
+	    	    		if(isa<CmpInst>(bci_user)){
 	    	    			continue;
 	    	    		}
 	    				errs() << "Having a new type of user for bitcast of realloc\n";
@@ -230,18 +248,18 @@ namespace {
 	  		arguments_free.push_back(first_free);
 	  		CallInst::Create(tag_function_free, arguments_free, "", ci->getNextNode());
 
+			//getting global counter to have different counter for new allocated memory
+			GlobalVariable *ima_tag_count = m->getGlobalVariable("ima_tag_count",true);
+			if(ima_tag_count==NULL){
+				errs() << "Could not get global tag count for IMA\n";
+				return false;
+			}
+			//load counter
+			LoadInst* load_ima_tag_count = new LoadInst(ima_tag_count, "", false, ci->getNextNode());
+
 	    	for(unsigned int i=0; i<storeinst_vector.size();i++){
 				StoreInst *si = storeinst_vector[i];
 				Instruction *next = si->getNextNode();
-
-				//getting global counter to have different counter for new allocated memory
-				GlobalVariable *ima_tag_count = m->getGlobalVariable("ima_tag_count",true);
-				if(ima_tag_count==NULL){
-					errs() << "Could not get global tag count for IMA\n";
-					return false;
-				}
-				//load counter
-				LoadInst* load_ima_tag_count = new LoadInst(ima_tag_count, "", false, next);
 
 				//tagging pointer memory of the pointer returned by realloc
 				CastInst* bitcast_inst = new BitCastInst(si->getOperand(1), Type::getInt8PtrTy(context), "", next);
@@ -269,10 +287,12 @@ namespace {
 				arguments_for_memory.push_back(load_ima_tag_count);
 				CallInst::Create(tag_function_for_memory, arguments_for_memory, "", next);
 
-				//increment counter
-				BinaryOperator* inc_ima_tag_count = BinaryOperator::Create(Instruction::Add, load_ima_tag_count, ConstantInt::get(Type::getInt32Ty(context), 1), "inc", next);
-				StoreInst* store_ima_tag_count = new StoreInst(inc_ima_tag_count, ima_tag_count, false, next);
-				store_ima_tag_count->setAlignment(4);
+				if(i==(storeinst_vector.size()-1)){
+					//increment counter
+					BinaryOperator* inc_ima_tag_count = BinaryOperator::Create(Instruction::Add, load_ima_tag_count, ConstantInt::get(Type::getInt32Ty(context), 1), "inc", next);
+					StoreInst* store_ima_tag_count = new StoreInst(inc_ima_tag_count, ima_tag_count, false, next);
+					store_ima_tag_count->setAlignment(4);
+				}
 	    	}
 
 	    	//storeinst_vector.clear();
@@ -295,7 +315,9 @@ namespace {
 	    		User *ci_user = *ci_use_it;
 	    		if(isa<StoreInst>(ci_user)){
 	    			StoreInst *si = (StoreInst*) ci_user;
-	    			storeinst_vector.push_back(si);
+	    			std::vector<StoreInst*>::iterator storeinst_vector_it;
+	    			storeinst_vector_it = storeinst_vector.begin();
+	    			storeinst_vector.insert(storeinst_vector_it, si);
 	    			continue;
 	    		}
 	    		if(isa<BitCastInst>(ci_user)){
@@ -305,7 +327,12 @@ namespace {
 	    				User *bci_user = *bci_use_it;
 	    	    		if(isa<StoreInst>(bci_user)){
 	    	    			StoreInst *si = (StoreInst*) bci_user;
-	    	    			storeinst_vector.push_back(si);
+	    	    			std::vector<StoreInst*>::iterator storeinst_vector_it;
+	    	    			storeinst_vector_it = storeinst_vector.begin();
+	    	    			storeinst_vector.insert(storeinst_vector_it, si);
+	    	    			continue;
+	    	    		}
+	    	    		if(isa<CmpInst>(bci_user)){
 	    	    			continue;
 	    	    		}
 	    				errs() << "Having a new type of user for bitcast of calloc\n";
@@ -332,18 +359,18 @@ namespace {
 			Module* m = bb->getParent()->getParent();
 			LLVMContext &context = bb->getContext();
 
+			//getting global counter to have different counter for new allocated memory
+			GlobalVariable *ima_tag_count = m->getGlobalVariable("ima_tag_count",true);
+			if(ima_tag_count==NULL){
+				errs() << "Could not get global tag count for IMA\n";
+				return false;
+			}
+			//load counter
+			LoadInst* load_ima_tag_count = new LoadInst(ima_tag_count, "", false, ci->getNextNode());
+
 	    	for(unsigned int i=0; i<storeinst_vector.size();i++){
 				StoreInst *si = storeinst_vector[i];
 				Instruction *next = si->getNextNode();
-
-				//getting global counter to have different counter for new allocated memory
-				GlobalVariable *ima_tag_count = m->getGlobalVariable("ima_tag_count",true);
-				if(ima_tag_count==NULL){
-					errs() << "Could not get global tag count for IMA\n";
-					return false;
-				}
-				//load counter
-				LoadInst* load_ima_tag_count = new LoadInst(ima_tag_count, "", false, next);
 
 				//tagging pointer memory of the pointer returned by calloc
 				CastInst* bitcast_inst = new BitCastInst(si->getOperand(1), Type::getInt8PtrTy(context), "", next);
@@ -373,10 +400,12 @@ namespace {
 				arguments_for_memory.push_back(load_ima_tag_count);
 				CallInst::Create(tag_function_for_memory, arguments_for_memory, "", next);
 
-				//increment counter
-				BinaryOperator* inc_ima_tag_count = BinaryOperator::Create(Instruction::Add, load_ima_tag_count, ConstantInt::get(Type::getInt32Ty(context), 1), "inc", next);
-				StoreInst* store_ima_tag_count = new StoreInst(inc_ima_tag_count, ima_tag_count, false, next);
-				store_ima_tag_count->setAlignment(4);
+				if(i==(storeinst_vector.size()-1)){
+					//increment counter
+					BinaryOperator* inc_ima_tag_count = BinaryOperator::Create(Instruction::Add, load_ima_tag_count, ConstantInt::get(Type::getInt32Ty(context), 1), "inc", next);
+					StoreInst* store_ima_tag_count = new StoreInst(inc_ima_tag_count, ima_tag_count, false, next);
+					store_ima_tag_count->setAlignment(4);
+				}
 	    	}
 
 	  		return true;
